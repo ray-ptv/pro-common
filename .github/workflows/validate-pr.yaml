@@ -2,6 +2,10 @@ name: validate pr
 
 on:
   workflow_call:
+    inputs:
+      pr_template:
+        required: true
+        type: string
 
 jobs:
   validate-pull-request:
@@ -44,7 +48,7 @@ jobs:
         id: template
         uses: chuhlomin/render-template@v1.7
         with:
-          template: .github/pull_request_template.md
+          template: ${{ inputs.pr_template }}
           vars: |
             ticket: "${{ steps.extract-variables.outputs.ticket }}"
             description: "${{ steps.extract-variables.outputs.description }}"
