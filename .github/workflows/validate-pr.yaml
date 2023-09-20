@@ -1,0 +1,59 @@
+name: validate pr
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-pull-request:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Pull ticket from title
+        id: values
+        uses: actions/github-script@v6
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = process.env.TITLE;
+            const pattern = /([^/]+\/)?(PRO-\d{4})(.*)/;
+            const match = pattern.exec(title);
+            
+            if (match) {
+              const ticket = match[2]; // This will contain "PRO-1234"
+              let description = match[3]; // This will contain what comes after "PRO-1234"
+              description = description.replace(/^[^a-zA-Z0-9]+/, '');
+              console.log("PRO ticket:", ticket);
+              console.log("PR description:", description);
+              const fs = require('fs');
+              fs.writeFileSync('ticket.txt', ticket);
+              fs.writeFileSync('description.txt', description);
+            }
+
+      - name: Extract variables
+        id: extract-variables
+        run: |
+          ticket=$(cat ticket.txt)
+          description=$(cat description.txt)
+          echo "ticket=${ticket}" >> $GITHUB_OUTPUT
+          echo "description=${description}" >> $GITHUB_OUTPUT
+      - name: Render template
+        id: template
+        uses: chuhlomin/render-template@v1.7
+        with:
+          template: .github/pull_request_template.md
+          vars: |
+            ticket: "${{ steps.extract-variables.outputs.ticket }}"
+            description: "${{ steps.extract-variables.outputs.description }}"
+      - name: Update PR body
+        uses: ivangabriele/find-and-replace-pull-request-body@v1.1.5
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          body: ${{ steps.template.outputs.result }}
+
+
