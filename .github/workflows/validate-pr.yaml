@@ -29,15 +29,15 @@ jobs:
               console.log("PRO ticket:", ticket);
               console.log("PR description:", description);
               const fs = require('fs');
-              fs.writeFileSync('ticket.txt', ticket);
-              fs.writeFileSync('description.txt', description);
+              fs.writeFileSync('ticket', ticket);
+              fs.writeFileSync('description', description);
             }
 
       - name: Extract variables
         id: extract-variables
         run: |
-          ticket=$(cat ticket.txt)
-          description=$(cat description.txt)
+          ticket=$(cat ticket)
+          description=$(cat description)
           echo "ticket=${ticket}" >> $GITHUB_OUTPUT
           echo "description=${description}" >> $GITHUB_OUTPUT
       - name: Render template
