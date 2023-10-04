@@ -14,8 +14,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Get branch name
-        run: echo ${GITHUB_REF##*/}
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract-branch
       - name: Pull ticket from title
         id: values
         uses: actions/github-script@v6
@@ -42,6 +44,7 @@ jobs:
       - name: Extract variables
         id: extract-variables
         run: |
+          echo ${{ steps.extract-branch.outputs.branch }}"
           ticket=$(cat ticket)
           description=$(cat description)
           echo "ticket=${ticket}" >> $GITHUB_OUTPUT
