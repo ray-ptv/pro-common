@@ -44,7 +44,8 @@ jobs:
       - name: Extract variables
         id: extract-variables
         run: |
-          echo ${{ steps.extract-branch.outputs.branch }}"
+          
+          echo "${{ steps.extract-branch.outputs.branch }}"
           ticket=$(cat ticket)
           description=$(cat description)
           echo "ticket=${ticket}" >> $GITHUB_OUTPUT
