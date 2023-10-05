@@ -28,12 +28,13 @@ jobs:
           script: |
             let title = process.env.TITLE;
             const fs = require('fs');
+
+            const branch = fs.readFileSync('branch', 'utf-8');
+            console.log('branch:', branch);
             const pattern = /([^/]+\/)?(PRO-\d{4})(.*)/;
             const matchTitle = pattern.exec(title);
             const matchBranch = pattern.exec(branch);
             
-            const branch = fs.readFileSync('branch', 'utf-8');
-            console.log('branch:', branch);
             
             if (matchTitle) {
               const ticket = matchTitle[2]; // This will contain "PRO-1234"
