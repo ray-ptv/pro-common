@@ -14,10 +14,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Extract branch name
-        shell: bash
-        run: echo "${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" > branch
-        id: extract-branch
       - name: Pull ticket from title
         id: values
         uses: actions/github-script@v6
@@ -28,9 +24,6 @@ jobs:
           script: |
             let title = process.env.TITLE;
             const fs = require('fs');
-
-            const branch = fs.readFileSync('branch', 'utf-8');
-            console.log('branch:', branch);
             const pattern = /([^/]+\/)?(PRO-\d{4})(.*)/;
             const matchTitle = pattern.exec(title);
             const matchBranch = pattern.exec(branch);
