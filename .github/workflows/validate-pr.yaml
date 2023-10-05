@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Extract branch name
         shell: bash
-        run: echo ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" > branch
+        run: echo "${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" > branch
         id: extract-branch
       - name: Pull ticket from title
         id: values
