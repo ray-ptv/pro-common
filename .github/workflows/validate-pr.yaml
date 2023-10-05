@@ -23,12 +23,12 @@ jobs:
         uses: actions/github-script@v6
         env:
           TITLE: ${{ github.event.pull_request.title }}
-          BRANCH: {GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             let title = process.env.TITLE;
-            const branch = process.env.BRANCH;
+            const branch = github.context.payload.ref;
+            console.log(branch)
             const pattern = /([^/]+\/)?(PRO-\d{4})(.*)/;
             const matchTitle = pattern.exec(title);
             const matchBranch = pattern.exec(branch);
