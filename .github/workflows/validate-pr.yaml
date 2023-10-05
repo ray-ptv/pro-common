@@ -85,9 +85,7 @@ jobs:
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}" \
-            -d '{
-              "title": "test",
-            }'
+            -d '{"title":"new title","body":"updated body","state":"open","base":"master"}'
 #      - name: Update PR body
 #        uses: tzkhan/pr-update-action@v2
 #        with:
