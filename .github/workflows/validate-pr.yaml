@@ -14,10 +14,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Extract branch name
-        shell: bash
-        run: echo "${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" > branch
-        id: extract-branch
       - name: Pull ticket from title
         id: values
         uses: actions/github-script@v6
@@ -27,19 +23,14 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             let title = process.env.TITLE;
-            const fs = require('fs');
-
-            const branch = fs.readFileSync('branch', 'utf-8');
-            console.log('branch:', branch);
+            const branch = githubHeadRef || githubRef.replace('refs/heads/', ''); 
             const pattern = /([^/]+\/)?(PRO-\d{4})(.*)/;
             const matchTitle = pattern.exec(title);
             const matchBranch = pattern.exec(branch);
             
             const githubHeadRef = process.env.GITHUB_HEAD_REF;
             const githubRef = process.env.GITHUB_REF;
-            const branchName = githubHeadRef || githubRef.replace('refs/heads/', '');
-            console.log(`branch=${branchName}`);
-            
+           
             
             if (matchTitle) {
               const ticket = matchTitle[2]; // This will contain "PRO-1234"
@@ -75,11 +66,22 @@ jobs:
           vars: |
             ticket: "${{ steps.extract-variables.outputs.ticket }}"
             description: "${{ steps.extract-variables.outputs.description }}"
-      - name: Update PR body
-        uses: tzkhan/pr-update-action@v2
-        with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          title-template: "${{ steps.extract-variables.outputs.title }}"
-          body-template: "${{ steps.template.outputs.result }}"
-          body-update-action: 'suffix'
+      - name: Update PR Title
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          NEW_TITLE="${{ steps.extract-variables.outputs.title }}"
+          
+          curl -X PATCH \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -d "{\"title\":\"$NEW_TITLE\"}" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}"
+#      - name: Update PR body
+#        uses: tzkhan/pr-update-action@v2
+#        with:
+#          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+#          title-template: "${{ steps.extract-variables.outputs.title }}"
+#          body-template: "${{ steps.template.outputs.result }}"
+#          body-update-action: 'suffix'
 
