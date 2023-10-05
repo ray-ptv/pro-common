@@ -46,6 +46,9 @@ jobs:
               title = ticket.concat(" ", title);
               fs.writeFileSync('ticket', ticket);
               fs.writeFileSync('title', title);
+            } else {
+              console.log("PR title nor branch name contains PRO ticket number")
+              process.exit(1);
             }
             
             fs.writeFileSync('title', title);
