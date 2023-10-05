@@ -85,8 +85,8 @@ jobs:
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}" \
             -d '{
-              "title": "'"${NEW_TITLE}"'",
-              "body": "'"${BODY_TEMPLATE}"'",
+              "title": ${NEW_TITLE},
+              "body": ${BODY_TEMPLATE},
             }'
 #      - name: Update PR body
 #        uses: tzkhan/pr-update-action@v2
