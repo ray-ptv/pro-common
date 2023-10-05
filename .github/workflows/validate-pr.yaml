@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Extract branch name
         shell: bash
-        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" > branch
+        run: echo "${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" > branch
         id: extract-branch
       - name: Pull ticket from title
         id: values
@@ -34,6 +34,11 @@ jobs:
             const pattern = /([^/]+\/)?(PRO-\d{4})(.*)/;
             const matchTitle = pattern.exec(title);
             const matchBranch = pattern.exec(branch);
+            
+            const githubHeadRef = process.env.GITHUB_HEAD_REF;
+            const githubRef = process.env.GITHUB_REF;
+            const branchName = githubHeadRef || githubRef.replace('refs/heads/', '');
+            console.log(`branch=${branchName}`);
             
             
             if (matchTitle) {
