@@ -26,11 +26,12 @@ jobs:
             const fs = require('fs');
             const pattern = /([^/]+\/)?(PRO-\d{4})(.*)/;
             const matchTitle = pattern.exec(title);
-            const matchBranch = pattern.exec(branch);
+            
             
             const githubHeadRef = process.env.GITHUB_HEAD_REF;
             const githubRef = process.env.GITHUB_REF;
             const branchName = githubHeadRef || githubRef.replace('refs/heads/', '');
+            const matchBranch = pattern.exec(branchName);
             console.log(`branch=${branchName}`);
             
             
