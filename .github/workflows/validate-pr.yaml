@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Extract branch name
         shell: bash
-        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        run: echo ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" > branch
         id: extract-branch
       - name: Pull ticket from title
         id: values
@@ -27,12 +27,13 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             let title = process.env.TITLE;
-            const branch = github.event.pull_request.head.ref;
-            console.log(branch)
+            const fs = require('fs');
             const pattern = /([^/]+\/)?(PRO-\d{4})(.*)/;
             const matchTitle = pattern.exec(title);
             const matchBranch = pattern.exec(branch);
-            const fs = require('fs');
+            
+            const branch = fs.readFileSync('branch', 'utf-8');
+            console.log('branch:', branch);
             
             if (matchTitle) {
               const ticket = matchTitle[2]; // This will contain "PRO-1234"
