@@ -47,7 +47,7 @@ jobs:
               fs.writeFileSync('ticket', ticket);
               fs.writeFileSync('title', title);
             } else {
-              console.log("PR title nor branch name contains PRO ticket number")
+              console.log("Wrong format: PR title or branch name must contain PRO ticket number")
               process.exit(1);
             }
             
