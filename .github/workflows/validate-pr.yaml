@@ -27,7 +27,6 @@ jobs:
             const pattern = /([^/]+\/)?(PRO-\d{4})(.*)/;
             const matchTitle = pattern.exec(title);
             
-            
             const githubHeadRef = process.env.GITHUB_HEAD_REF;
             const githubRef = process.env.GITHUB_REF;
             const branchName = githubHeadRef || githubRef.replace('refs/heads/', '');
@@ -39,50 +38,40 @@ jobs:
               description = description.replace(/^[^a-zA-Z0-9]+/, '');
               console.log("PRO ticket:", ticket);
               console.log("PR description:", description);
-              fs.writeFileSync('ticket', ticket);
-              fs.writeFileSync('description', description);
+              core.setOutput('ticket', ticket);
+              core.setOutput('description', description);
             } else if (matchBranch) {
               const ticket = matchBranch[2];
               title = ticket.concat(" ", title);
-              fs.writeFileSync('ticket', ticket);
-              fs.writeFileSync('title', title);
+              core.setOutput('ticket', ticket);
+              core.setOutput('title', title);
             } else {
               console.log("Wrong format: PR title or branch name must contain PRO ticket number")
               process.exit(1);
             }
             
             fs.writeFileSync('title', title);
-
-      - name: Extract variables
-        id: extract-variables
-        run: |
-          ticket=$(cat ticket)
-          title=$(cat title)
-          description=$(cat description)
-          echo "ticket=${ticket}" >> $GITHUB_OUTPUT
-          echo "title=${title}" >> $GITHUB_OUTPUT
-          echo "description=${description}" >> $GITHUB_OUTPUT
       - name: Render template
         id: template
         uses: chuhlomin/render-template@v1.7
         with:
           template: ${{ inputs.pr_template }}
           vars: |
-            ticket: "${{ steps.extract-variables.outputs.ticket }}"
-            description: "${{ steps.extract-variables.outputs.description }}"
+            ticket: "${{ steps.values.outputs.ticket }}"
+            description: "${{ steps.values.outputs.description }}"
       - name: Update PR Title
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_NUMBER=${{ github.event.pull_request.number }}
-          NEW_TITLE="${{ steps.extract-variables.outputs.title }}"
+          TITLE="${{ steps.values.outputs.title }}"
           BODY_TEMPLATE="${{ steps.template.outputs.result }}"
           
           echo "PR_NUMBER: $PR_NUMBER"
-          echo "NEW_TITLE: $NEW_TITLE"
+          echo "TITLE: $TITLE"
           echo "BODY_TEMPLATE: $BODY_TEMPLATE"
 
-          JSON_PAYLOAD=$(jq -n --arg title "$NEW_TITLE" --arg body "$BODY_TEMPLATE" '{ "title": $title, "body": $body }')
+          JSON_PAYLOAD=$(jq -n --arg title "$TITLE" --arg body "$BODY_TEMPLATE" '{ "title": $title, "body": $body }')
             
           curl -L \
             -X PATCH \
