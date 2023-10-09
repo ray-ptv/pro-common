@@ -51,6 +51,18 @@ jobs:
             }
             
             core.setOutput('title', title);
+
+      - name: Fetch PR
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          run: |
+            response=$(curl -L \
+              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -H "Content-Type: application/json" \
+              -d "$JSON_PAYLOAD" \
+              "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}")
+            echo "$response"
       - name: Render template
         id: template
         uses: chuhlomin/render-template@v1.7
@@ -59,7 +71,7 @@ jobs:
           vars: |
             ticket: "${{ steps.values.outputs.ticket }}"
             description: "${{ steps.values.outputs.description }}"
-      - name: Update PR Title
+      - name: Update PR
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
