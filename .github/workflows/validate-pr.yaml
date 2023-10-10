@@ -65,6 +65,11 @@ jobs:
           BODY_TEMPLATE=$(echo "$response" | jq -r '.body')     
           TITLE="${{ steps.values.outputs.title }}"
           
+          old_value="{{ .ticket }}"
+          new_value=$BODY_TEMPLATE
+          
+          body=$(echo "$body" | sed "s/$old_value/$new_value/g")
+          
           JSON_PAYLOAD=$(jq -n --arg title "$TITLE" --arg body "$BODY_TEMPLATE" '{ "title": $title, "body": $body }')
           
           curl -L \
