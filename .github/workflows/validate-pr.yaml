@@ -93,12 +93,6 @@ jobs:
                               .replace(/{{ \.ticket }}/g, process.env.TICKET)
                               .replace(/{{ \.description }}/g, description);
             
-              response = await octokit.request(`GET , {
-              headers: {
-                'X-GitHub-Api-Version': '2022-11-28'
-              }
-            });
-            
             const res = await octokit.request(`PATCH /repos/${{ github.repository }}/pulls/${process.env.PR_NUMBER}`, {
               title: process.env.TITLE,
               body: newBody,
