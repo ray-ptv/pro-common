@@ -81,7 +81,7 @@ jobs:
               }
             });
             
-            console.log(response.body);
+            console.log(response);
 
       - name: Render template
         id: template
