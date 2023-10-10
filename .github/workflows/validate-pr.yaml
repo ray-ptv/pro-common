@@ -75,7 +75,7 @@ jobs:
             console.log(process.env.TITLE);
             console.log(process.env.PR_NUMBER);
          
-            await octokit.request(`PATCH /repos/${{ github.repository }}/pulls/${process.env.PR_NUMBER}`, {
+            response = await octokit.request(`PATCH /repos/${{ github.repository }}/pulls/${process.env.PR_NUMBER}`, {
             pull_number: process.env.PR_NUMBER,
             title: process.env.TITLE,
             body: process.env.BODY_TEMPLATE,
@@ -83,6 +83,7 @@ jobs:
               'X-GitHub-Api-Version': '2022-11-28'
             }
             });
+            console.log(response)
       - name: Render template
         id: template
         uses: chuhlomin/render-template@v1.7
