@@ -64,11 +64,13 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const { Octokit } = require("@octokit/core");
+  
             const octokit = new Octokit({
             request: {
               fetch: fetch,
             },
-            auth: process.env.GITHUB_TOKEN
+            auth: process.env.GITHUB_TOKEN,
             });
             console.log(process.env.TITLE);
             console.log(process.env.PR_NUMBER);
