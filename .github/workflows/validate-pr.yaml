@@ -65,7 +65,7 @@ jobs:
           body=$(echo "$response" | jq -r '.body')
           escaped_body="\"$body\""
           echo "$escaped_body"
-          echo "body=${escaped_body}" >> $GITHUB_OUTPUT
+          printf "body=%s" "$escaped_body" >> "$GITHUB_OUTPUT"
       - name: Render template
         id: template
         uses: chuhlomin/render-template@v1.7
