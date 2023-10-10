@@ -14,10 +14,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
       - name: Install octokit
         run: npm install @octokit/core
       - name: Pull ticket from title
@@ -68,13 +64,17 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { Octokit } = require("@octokit/core");
+            import fetch from "node-fetch";
+  
+            const octokit = new Octokit({
+            request: {
+              fetch: fetch,
+            },
+            auth: process.env.GITHUB_TOKEN
+            });
             console.log(process.env.TITLE);
             console.log(process.env.PR_NUMBER);
-            const octokit = new Octokit({
-              auth: process.env.GITHUB_TOKEN
-            });
-
+         
             await octokit.request(`PATCH /repos/${{ github.repository }}/pulls/${process.env.PR_NUMBER}`, {
             pull_number: process.env.PR_NUMBER,
             title: process.env.TITLE,
