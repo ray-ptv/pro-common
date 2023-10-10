@@ -42,8 +42,11 @@ jobs:
               const matchDescription = title.match(/\d{4}(?:(.*))/);
               if (matchDescription && matchDescription[1]) {
                 description = matchDescription[1]; // Get description after the ticket number
+                title = ticket.concat(': ', description);
               }
-              title = ticket.concat(': ', title);
+              else {
+                title = ticket.concat(': ', title);
+              }
             } else {
               console.log("Wrong format: PR title or branch name must contain PRO ticket number");
               process.exit(1);
