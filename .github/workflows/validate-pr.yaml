@@ -59,6 +59,7 @@ jobs:
         uses: actions/github-script@v6
         env:
           TITLE: ${{ steps.values.outputs.title }}
+          DESCRIPTION: ${{ steps.values.outputs.description }}
           TICKET: ${{ steps.values.outputs.ticket }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -76,6 +77,9 @@ jobs:
             console.log(process.env.TITLE);
             console.log(process.env.TICKET);
             console.log(process.env.PR_NUMBER);
+            console.log(process.env.DESCRIPTION);
+            
+            const description = process.env.DESCRIPTION ? process.env.DESCRIPTION : process.env.TITLE
             
             response = await octokit.request(`GET /repos/${{ github.repository }}/pulls/${process.env.PR_NUMBER}`, {
               headers: {
@@ -87,7 +91,9 @@ jobs:
             
             console.log(resBody);
             
-            const replacedString = resBody.replace(/{{ \.ticket }}/g, process.env.TICKET);
+            const replacedString = resBody
+                                    .replace(/{{ \.ticket }}/g, process.env.TICKET)
+                                    .replace(/{{ \.description }}/g, description);
             
             console.log(replacedString);
 
