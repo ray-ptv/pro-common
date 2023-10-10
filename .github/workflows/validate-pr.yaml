@@ -39,7 +39,7 @@ jobs:
               description = matchTitle[3]; // This will contain what comes after "PRO-1234"             
             } else if (matchBranch) {
               ticket = matchBranch[2]; // Get Jira ticket number from branch name
-              const parts = title.match(/PRO[- ]?\d{4}/);
+              const parts = title.split(/PRO[- ]?\d{4}/);
               if (parts.length > 1) {
                 description = parts[1]; // Get values from after the ticket number
                 title = ticket + description
