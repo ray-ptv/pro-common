@@ -81,39 +81,10 @@ jobs:
               }
             });
             
-            console.log(response.data.body);
+            resBody = response.data.body;
             
-            core.setOutput('body', response.data.body);
-
-      - name: Render template
-        id: template
-        uses: chuhlomin/render-template@v1.7
-        with:
-          template: ${{ steps.pull_request.outputs.body }}
-          vars: |
-            ticket: "${{ steps.values.outputs.ticket }}"
-            description: "${{ steps.values.outputs.description }}"
-      - name: Update PR
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PR_NUMBER=${{ github.event.pull_request.number }}
-          TITLE="${{ steps.values.outputs.title }}"
-          BODY_TEMPLATE="${{ steps.template.outputs.result }}"
-          
-          echo "PR_NUMBER: $PR_NUMBER"
-          echo "TITLE: $TITLE"
-          echo "BODY_TEMPLATE: $BODY_TEMPLATE"
-
-          JSON_PAYLOAD=$(jq -n --arg title "$TITLE" --arg body "$BODY_TEMPLATE" '{ "title": $title, "body": $body }')
+            const replacedString = resBody.replace(/{{ \.ticket }}/g, ${{ steps.values.outputs.ticket }});
             
-          curl -L \
-            -X PATCH \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: token $GITHUB_TOKEN" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            -H "Content-Type: application/json" \
-            -d "$JSON_PAYLOAD" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}"
+            console.log(replacedString)
 
 
