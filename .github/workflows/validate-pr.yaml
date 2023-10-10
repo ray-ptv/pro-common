@@ -32,7 +32,7 @@ jobs:
             const matchTitle = pattern.exec(title);
             
             const branchName = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF.replace('refs/heads/', '');
-            const matchBranch = pattern.exec(branchName);
+            const matchBranch = pattern.exec(branchName.toUpperCase());
             
             if (matchTitle) {
               ticket = matchTitle[2]; // This will contain "PRO-1234"
