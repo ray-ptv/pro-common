@@ -81,7 +81,9 @@ jobs:
               }
             });
             
-            console.log(response.data);
+            console.log(response.data.body);
+            
+            core.setOutput('body', response.data.body);
 
       - name: Render template
         id: template
