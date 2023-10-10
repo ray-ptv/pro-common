@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: Install octokit
+        run: npm install @octokit/core
       - name: Pull ticket from title
         id: values
         uses: actions/github-script@v6
@@ -54,32 +56,30 @@ jobs:
 
       - name: Fetch PR
         id: pull_request
+        uses: actions/github-script@v6
         env:
+          TITLE: ${{ steps.values.outputs.title }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          response=$(curl -L \
-            -H "Authorization: token $GITHUB_TOKEN" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            -H "Content-Type: application/json" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}")
-          body=$(echo "$response" | jq -r '.body')
-          echo "$body"
-          TITLE="${{ steps.values.outputs.title }}"
-          
-          BODY_TEMPLATE=$(echo "$body" | sed "s@{{ \.ticket }}@$body@g")
-          
-          JSON_PAYLOAD=$(jq -n --arg title "$TITLE" --arg body "$BODY_TEMPLATE" '{ "title": $title, "body": $body }')
-          
-          curl -L \
-            -X PATCH \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: token $GITHUB_TOKEN" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            -H "Content-Type: application/json" \
-            -d "$JSON_PAYLOAD" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}"
-          
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { Octokit } = require("@octokit/core");
+            console.log(process.env.TITLE);
+            console.log(process.env.PR_NUMBER);
+            console.log(process.env.BODY_TEMPLATE);
+            const octokit = new Octokit({
+              auth: process.env.GITHUB_TOKEN
+            });
 
+            await octokit.request(`PATCH /repos/${{ github.repository }}/pulls/${process.env.PR_NUMBER}`, {
+            pull_number: process.env.PR_NUMBER,
+            title: process.env.TITLE,
+            body: process.env.BODY_TEMPLATE,
+            headers: {
+              'X-GitHub-Api-Version': '2022-11-28'
+            }
+            });
       - name: Render template
         id: template
         uses: chuhlomin/render-template@v1.7
