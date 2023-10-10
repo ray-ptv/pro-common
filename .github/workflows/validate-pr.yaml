@@ -64,7 +64,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            import fetch from "node-fetch";
+            const fetch = require("node-fetch");
   
             const octokit = new Octokit({
             request: {
